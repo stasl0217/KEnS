@@ -5,11 +5,11 @@ Resources and code for paper "Multiplingual Knowledge Graph Completion via Ensem
 ## Install
 Make sure your local environment has the following installed:
 
-  python==3.6
-  pandas
-  tensorflow==1.10.0
-  numpy==1.16.2
-  pandas==1.0.3
+    python==3.6
+    pandas
+    tensorflow==1.10.0
+    numpy==1.16.2
+    pandas==1.0.3
     
 Install the dependents using:
 
@@ -31,4 +31,4 @@ Xuelu Chen, Muhao Chen, Changjun Fan, Ankith Uppunda, Yizhou Sun, Carlo Zaniolo.
       booktitle={Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: Findings},
       pages={3227--3238},
       year={2020}
-}
+    }
