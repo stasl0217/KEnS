@@ -16,7 +16,7 @@ Install the dependents using:
     pip install -r requirements.txt
 
 ## Run the experiments
-To run the experiments, use:
+To run the experiments for KEns-boost(RotatE), use:
 
     python ./run.py
     python ./test.py
