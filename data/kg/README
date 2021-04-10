@@ -1,2 +1,0 @@
-train: 60%, val: 30%, test: 10%
-split from data/migrated
