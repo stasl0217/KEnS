@@ -23,7 +23,8 @@ To run the experiments, use:
 
 
 ## Reference
-Please refer to our paper. 
+Please refer to our paper:
+
 Xuelu Chen, Muhao Chen, Changjun Fan, Ankith Uppunda, Yizhou Sun, Carlo Zaniolo. Multilingual Knowledge Graph Completion via Ensemble Knowledge T. In *Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: Findings*, 2020
 
     @inproceedings{chen2020multilingual,
