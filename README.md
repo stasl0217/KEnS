@@ -19,6 +19,7 @@ Install the dependents using:
 To run the experiments, use:
 
     python ./run.py
+    python ./test.py
 
 
 ## Reference
