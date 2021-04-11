@@ -8,14 +8,13 @@ from src.ensemble import voting, voting_with_model_weight, voting_with_model_wei
 from inspect import signature
 from src.model import project_t, create_alignment_kNN_finder
 import logging
+from os.path import join
 
 
 class TestMode(Enum):
     KG0 = 'kg0'
     KG1 = 'kg1'
-    TRANS_REDIRECT = 'transform_redirect'
     Transfer = 'link_redirect'
-    SEARCH_REDIRECT = 'search_redirect'
     VOTING = 'voting'
 
 
@@ -217,7 +216,6 @@ class MultiModelTester:
         :param mode: TestMode. For LINK_TRANSFER, triples without links will be skipped
         :return:
         """
-
         time0 = time.time()
         hits = 0
         samples = param.n_test
@@ -495,6 +493,7 @@ def filt_hits_at_n(results, lang, hr2t_train, n):
             hits += 1
     hits_ratio = hits / results.shape[0]
     logging.info('Hits@%d (%d triples)(filt): %.4f' % (n, results.shape[0], hits_ratio))
+    return hits_ratio
 
 
 def filt_ensemble_hits_at_n(results, weight, model_lists, hr2t_train, n):
@@ -534,5 +533,22 @@ def filt_ensemble_hits_at_n(results, weight, model_lists, hr2t_train, n):
             hits += 1
     hits_ratio = hits / results.shape[0]
     logging.info('Hits@%d (%d triples): %.4f' % (n, results.shape[0], hits_ratio))
+
+
+
+
+def hr2t_from_train_set(data_dir, target_lang):
+    train_df = pd.read_csv(join(data_dir, f'{target_lang}-train.tsv'), sep='\t')
+    tripleset = set([tuple([h,r,t]) for h,r,t in (train_df.values)])
+
+    hr2t = {}  # {(h,r):set(t)}
+    for tp in tripleset:
+        h,r,t=tp[0],tp[1],tp[2]
+        if (h,r) not in hr2t:
+            hr2t[(h,r)] = set()
+        hr2t[(h,r)].add(t)
+    return hr2t
+
+
 
 

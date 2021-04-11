@@ -5,12 +5,11 @@ lr = 0.0001
 prior_epoch = 100
 batch_size = 2048
 reg_scale = 1e-5
-dim = 1000
+dim = 400
 k = 10
 lang = 'ja'
-src_lang = 'de'
 neg_per_pos = 1
-n_test = 100
+n_test = 1000  # quick test for validation
 round = 1
 align_lr = 1e-3
 verbose = False
@@ -29,14 +28,16 @@ updating_embedding = True  # True for training, False for testing
 json_model = False
 
 knowledge = 'rotate'
-
-rrf_const = 50
-
-csls = False
-
-
 # for RotatE
 gamma = 24
 epsilon = 1e-8
 def rotate_embedding_range():
     return (gamma+epsilon)/(dim/2)
+
+
+# obsolete
+src_lang = 'en'
+rrf_const = 50
+csls = False
+
+

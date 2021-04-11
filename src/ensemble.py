@@ -119,7 +119,7 @@ def voting_with_model_weight(choice_lists, k, model_weights=None):
 def filt_voting_with_model_weight(choice_lists, k, train_ts, model_weights=None):
     """
     :param choice_lists: list[list[(item, score)]]. choices from each model
-    :param model_weights: weight for each choice_list (model). len(model_weights)==len(choice_lists). Default: [1, 0.3, 0.3, ...]
+    :param model_weights: weight for each choice_list (model).
     :param k: return top k.
     :param train_ts: filter the t that has appeared in training set
     :return:

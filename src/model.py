@@ -6,15 +6,9 @@ import time
 import numpy as np
 from scipy.spatial.distance import cosine as cos_dist
 import logging
+import pandas as pd
+from os.path import join
 
-if param.knowledge == 'transe':
-    print('Using Knowledge model TransE')
-    from src.TransE import define_loss, project_t, find_kNN
-elif param.knowledge == 'rotate':
-    print('Using knowledge model RotatE')
-    from src.rotate import project_t, define_loss, find_kNN
-
-from .modellist import AlignModel
 
 
 def create_kNN_finder(predictor, num_entity):
@@ -87,7 +81,7 @@ def create_knowledge_model(num_entity, num_relation, relation_layer=None):
         emd_range = param.rotate_embedding_range()
         entity_embedding_layer = keras.layers.Embedding(input_dim=num_entity,
                                                         output_dim=param.dim,
-                                                        # double embedding. please put an even number
+                                                        # double embedding. need an even number
                                                         embeddings_initializer=keras.initializers.RandomUniform(
                                                             -emd_range, emd_range)
                                                         )
@@ -118,20 +112,18 @@ def create_knowledge_model(num_entity, num_relation, relation_layer=None):
     pos_loss = loss_layer([t, projected_t])
 
     # negative sampling
-    random_t_indices = keras.layers.Lambda(
+    rand_negs = keras.layers.Lambda(
         lambda placeholder: tf.random_uniform(shape=(param.neg_per_pos,), maxval=num_entity - 1),
         name='generate_negative_t_samples')(input_h)  # input_h is just a placeholder
     # random_t_indices = keras.backend.variable(tf.random_uniform(shape=(param.neg_per_pos,), maxval=num_entity - 1))
-    neg_ts = entity_embedding_layer(random_t_indices)  # (3, 128)
+    neg_ts = entity_embedding_layer(rand_negs)  # (3, 128)
     neg_losses = loss_layer([t, neg_ts])
 
     if param.knowledge == 'rotate':
         # current loss is actually dist
         gm = param.gamma
-        pos_loss1 = keras.layers.Lambda(lambda dist: -tf.log_sigmoid(gm - dist), output_shape=(1,))(pos_loss)
-        # pos_loss1 = keras.layers.Lambda(lambda dist: -tf.math.log(tf.math.softplus(gm - dist)), output_shape=(1,))(pos_loss)
-        neg_losses1 = keras.layers.Lambda(lambda dist: -tf.log_sigmoid(dist - gm), output_shape=(param.neg_per_pos,))(neg_losses)
-        # neg_losses1 = keras.layers.Lambda(lambda dist: -tf.math.log(tf.math.softplus(dist-gm)), output_shape=(param.neg_per_pos,))(neg_losses)
+        pos_loss1 = keras.layers.Lambda(lambda dist: -tf.math.log(tf.math.softplus(gm - dist)), output_shape=(1,))(pos_loss)
+        neg_losses1 = keras.layers.Lambda(lambda dist: -tf.math.log(tf.math.softplus(dist-gm)), output_shape=(param.neg_per_pos,))(neg_losses)
         neg_loss1 = keras.layers.Lambda(lambda x: tf.reduce_mean(x, axis=-1), output_shape=(1,),
                                        name='average_loss_over_neg_samples')(neg_losses1)
         total_loss = keras.layers.Lambda(lambda loss: (loss[0] + loss[1]) / 2, output_shape=(1,))([pos_loss1, neg_loss1])
@@ -156,6 +148,50 @@ def create_knowledge_model(num_entity, num_relation, relation_layer=None):
     kNN_finder = create_kNN_finder(predictor, num_entity)
 
     return model, predictor, kNN_finder
+
+def project_t(hr):
+    if param.knowledge == 'transe':
+        return hr[0] + hr[1]
+    elif param.knowledge == 'rotate':
+        pi = 3.14159265358979323846
+        head, relation = hr[0], hr[1]
+        re_head, im_head = tf.split(head, 2, axis=2)  # input shape: (None, 1, dim)
+
+        embedding_range = param.rotate_embedding_range()
+
+        #Make phases of relations uniformly distributed in [-pi, pi]
+        phase_relation = relation/(embedding_range/pi)
+
+        re_relation = tf.cos(phase_relation)
+        im_relation = tf.sin(phase_relation)
+
+        re_tail = re_head * re_relation - im_head * im_relation
+        im_tail = re_head * im_relation + im_head * re_relation
+
+        predicted_tail = tf.concat([re_tail, im_tail], axis=-1)
+
+        return predicted_tail
+
+def define_loss(t_true_pred):
+    t_true = t_true_pred[0]
+    t_pred = t_true_pred[1]
+
+    # tf.norm() will result in nan loss when tf.norm([0])
+    # USE tf.reduce_mean(tf.square()) INSTEAD!!!
+    # return tf.reduce_mean(tf.square(t_true-t_pred), axis=2)  # input shape: (None, 1, dim)
+    return tf.norm(t_true - t_pred + 1e-8, axis=2)  # input shape: (None, 1, dim)
+
+def find_kNN(t_vec_and_embed_matrix):
+    """
+    :param t_vec_and_embed_matrix:
+    :return: [top_k_entity_idx, top_k_scores(larger is better)] . top_k_entity_idx shape [1,k].
+                e.g., [array([[64931, 13553, 20458]]), array([[-1.008282 , -2.0292854, -3.059666]])]
+    """
+    predicted_t_vec = tf.squeeze(t_vec_and_embed_matrix[0])  # shape (batch_size=1, 1, dim) -> (dim,)
+    embedding_matrix = tf.reshape(t_vec_and_embed_matrix[1], [-1, param.dim])  # new shape (num_entity, dim*2), *2 for double embedding
+    distance = tf.norm(tf.subtract(embedding_matrix, predicted_t_vec), axis=1)
+    top_k_scores, top_k_t = tf.nn.top_k(-distance, k=param.k)  # find indices of k largest score. score = neg(distance)
+    return [tf.reshape(top_k_t, [1, param.k]), tf.reshape(top_k_scores, [1, param.k])]  # reshape to one row matrix to fit keras model output
 
 
 def define_align_loss(v1v2v3v4):
@@ -217,6 +253,7 @@ def save_model_structure(model, output_path):
     json_string = model.to_json()
     with open(output_path, 'w') as outfile:
         outfile.write(json_string)
+
 
 
 def extend_seed_align_links(kg0, kg1, seed_links):
@@ -307,7 +344,6 @@ def extend_seed_align_links(kg0, kg1, seed_links):
             # check if they are mutual neighbors
             if nearest_for_e0[true_e0] != -1:
                 e1 = nearest_for_e0[true_e0]
-
                 if nearest_for_e1[e1] == -2:  # e1's nearest number not computed yet. compute it now
                     e1_neighbors = e1_neighborhood[e1, :]  # e0's neighbor in kg1 domain
                     nearest_e0 = -1
