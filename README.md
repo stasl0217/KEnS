@@ -23,7 +23,7 @@ Install the dependents using:
     
 * You can use `--knowledge_model transe` to switch from KEns(RotatE) to the KEnS(TransE). 
 * `--target_language` could be set as `ja, es, el, en, fr`. 
-* `--use_default` means to use the preset hyper-parameters. 
+* `--use_default` means to use the preset hyper-parameter combinations. 
 * By default, the trained models are saved in `$PROJECT_DIR$/trained_model/kens-$KNOWLEDGE_MODEL$-$DIM$/$TARGET_LANGUAGE$`.
 
 To set your own hyper-parameters:
