@@ -16,11 +16,23 @@ Install the dependents using:
     pip install -r requirements.txt
 
 ## Run the experiments
-To run the experiments for KEns-boost(RotatE), use:
+1. To train the model for KEnS(RotatE), use:
 
-    python ./run.py
-    python ./test.py
+    python ./run.py --knowledge_model rotate --target_language ja --use_default
+    
+You can use `-m transe` to switch to the KEnS(TransE) and change `--target_language` to `es, el, en, fr` to train for different target languages. `--use_default` means to use the preset hyper-parameters.
 
+To set your own hyper-parameters:
+
+    python ./run.py --knowledge_model rotate --target_language ja -d 400 -b 2048 -lr 1e-2 --rotate_gamma 24 --reg_scale 1e-4 --base_align_step 5 --knowledge_step_ratio 20 --align_lr 1e-3
+
+
+    
+2. To test the trained model with ensemble techniques, use:
+
+    python ./test.py --knowledge_model rotate --target_language ja --model_dir $TRAINED_MODEL_DIR$  -d $YOUR_MODEL_DIM$
+    
+By default, the trained model is saved in `$PROJECT_DIR$/trained_model/kens-$KNOWLEDGE_MODEL$-$DIM$/$TARGET_LANGUAGE$`.
 
 ## Reference
 Please refer to our paper:
