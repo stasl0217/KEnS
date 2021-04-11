@@ -16,19 +16,22 @@ Install the dependents using:
     pip install -r requirements.txt
 
 ## Run the experiments
-1. To train the model for KEnS(RotatE), use:
+
+### To train the model, use:
 
     python ./run.py --knowledge_model rotate --target_language ja --use_default
     
-    
-You can use `-m transe` to switch to the KEnS(TransE) and change `--target_language` to `es, el, en, fr` to train for different target languages. `--use_default` means to use the preset hyper-parameters. By default, the trained models are saved in `$PROJECT_DIR$/trained_model/kens-$KNOWLEDGE_MODEL$-$DIM$/$TARGET_LANGUAGE$`.
+* You can use `--knowledge_model transe` to switch from KEns(RotatE) to the KEnS(TransE). 
+* `--target_language` could be set as `ja, es, el, en, fr`. 
+* `--use_default` means to use the preset hyper-parameters. 
+* By default, the trained models are saved in `$PROJECT_DIR$/trained_model/kens-$KNOWLEDGE_MODEL$-$DIM$/$TARGET_LANGUAGE$`.
 
 To set your own hyper-parameters:
 
     python ./run.py --knowledge_model rotate --target_language ja -d 400 -b 2048 -lr 1e-2 --rotate_gamma 24 --reg_scale 1e-4 --base_align_step 5 --knowledge_step_ratio 20 --align_lr 1e-3
 
 
-2. To test the trained model with the ensemble technique, use:
+### To test the trained model with the ensemble technique, use:
 
     python ./test.py --knowledge_model rotate --target_language ja --model_dir $TRAINED_MODEL_DIR$  -d $YOUR_MODEL_DIM$
     
