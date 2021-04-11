@@ -21,7 +21,7 @@ Install the dependents using:
 
     python ./run.py --knowledge_model rotate --target_language ja --use_default
     
-* You can use `--knowledge_model transe` to switch from KEns(RotatE) to the KEnS(TransE). 
+* You can use `--knowledge_model transe` to switch from KEnS(RotatE) to the KEnS(TransE). 
 * `--target_language` could be set as `ja, es, el, en, fr`. 
 * `--use_default` means to use the preset hyper-parameter combinations. 
 * By default, the trained models are saved in `$PROJECT_DIR$/trained_model/kens-$KNOWLEDGE_MODEL$-$DIM$/$TARGET_LANGUAGE$`.
@@ -30,6 +30,8 @@ To set your own hyper-parameters:
 
     python ./run.py --knowledge_model rotate --target_language ja -d 400 -b 2048 -lr 1e-2 --rotate_gamma 24 --reg_scale 1e-4 --base_align_step 5 --knowledge_step_ratio 20 --align_lr 1e-3
 
+
+Download the pre-trained KEnS(RotatE) model (dimension=400) for Japanese KG: https://drive.google.com/file/d/1GJJmkStYuRVfTYXi1OvtuCwVflkKaqD0/view?usp=sharing
 
 ### To test the trained model with the ensemble techniques, use:
 
