@@ -31,7 +31,7 @@ To set your own hyper-parameters:
     python ./run.py --knowledge_model rotate --target_language ja -d 400 -b 2048 -lr 1e-2 --rotate_gamma 24 --reg_scale 1e-4 --base_align_step 5 --knowledge_step_ratio 20 --align_lr 1e-3
 
 
-### To test the trained model with the ensemble technique, use:
+### To test the trained model with the ensemble techniques, use:
 
     python ./test.py --knowledge_model rotate --target_language ja --model_dir $TRAINED_MODEL_DIR$  -d $YOUR_MODEL_DIM$
     
