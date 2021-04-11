@@ -3,7 +3,6 @@
 
 
 import src.param as param
-param.knowledge = 'rotate'
 
 """
 In all variable names, 0 denotes the target/sparse kg and 1 denotes the support kg.

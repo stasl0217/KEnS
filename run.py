@@ -8,10 +8,6 @@ Working directory: project root
 In all variable names, 0 denotes the target/sparse kg and 1 denotes the source/dense kg.
 """
 import src.param as param
-param.knowledge = 'rotate'
-
-
-# In[3]:
 
 
 import os
@@ -26,10 +22,8 @@ if './' not in sys.path:
 from numpy.linalg import norm
 import pandas as pd
 import src.param as param
-
-
-from src.model import save_model_structure, create_alignment_kNN_finder
-from src.data_loader import load_support_kgs, load_target_kg, load_align_link_table, take_seed_align_links,     load_all_to_all_seed_align_links
+from src.model import save_model_structure
+from src.data_loader import load_support_kgs, load_target_kg, load_all_to_all_seed_align_links
 from src.validate import MultiModelTester, TestMode, test_alignment_hits10
 import numpy as np
 import logging
@@ -194,8 +188,6 @@ def main(args):
 
         model_weights = []
         if i % param.val_freq == 0:  # validation
-            param.updating_embedding = False
-
             logging.info(f'=== round {i}')
             logging.info(f'[{kg0.lang}]')
             hits10_kg0 = validator.test(TestMode.KG0)
