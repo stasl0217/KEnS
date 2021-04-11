@@ -28,7 +28,7 @@ To set your own hyper-parameters:
 
 
     
-2. To test the trained model with ensemble techniques, use:
+2. To test the trained model with the boosting technique, use:
 
     python ./test.py --knowledge_model rotate --target_language ja --model_dir $TRAINED_MODEL_DIR$  -d $YOUR_MODEL_DIM$
     
