@@ -1,5 +1,5 @@
 # KEnS
-Resources and code for paper "Multiplingual Knowledge Graph Completion via Ensemble Knowledge Transfer"
+Resources and code for paper "Multilingual Knowledge Graph Completion via Ensemble Knowledge Transfer"
 
 
 ## Install
